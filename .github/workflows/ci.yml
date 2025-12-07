@@ -12,6 +12,7 @@ jobs:
       SERVER_USER: ${{ secrets.SERVER_USER }}
       SERVER_PASSWORD: ${{ secrets.SERVER_PASSWORD }}
       SERVER_PATH: ${{ secrets.SERVER_PATH }}
+      FRONTEND_URL: ${{ secrets.FRONTEND_URL }}
       DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
 
     steps:
@@ -89,6 +90,12 @@ jobs:
           COMMIT_SHA=$(git rev-parse --short HEAD || echo "N/A")
           BRANCH=$(git rev-parse --abbrev-ref HEAD || echo "N/A")
           
+          if [ -n "$FRONTEND_URL" ]; then
+            FRONTEND_VALUE="[Visit Site]($FRONTEND_URL)"
+          else
+            FRONTEND_VALUE="N/A"
+          fi
+          
           JSON_PAYLOAD=$(cat <<EOF
           {
             "embeds": [{
@@ -122,6 +129,11 @@ jobs:
                   "inline": true
                 },
                 {
+                  "name": "Frontend",
+                  "value": "$FRONTEND_VALUE",
+                  "inline": true
+                },
+                {
                   "name": "Workflow",
                   "value": "[View Run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})",
                   "inline": true
@@ -149,6 +161,12 @@ jobs:
           COMMIT_SHA=$(git rev-parse --short HEAD || echo "N/A")
           BRANCH=$(git rev-parse --abbrev-ref HEAD || echo "N/A")
           
+          if [ -n "$FRONTEND_URL" ]; then
+            FRONTEND_VALUE="[Visit Site]($FRONTEND_URL)"
+          else
+            FRONTEND_VALUE="N/A"
+          fi
+          
           JSON_PAYLOAD=$(cat <<EOF
           {
             "embeds": [{
@@ -175,6 +193,11 @@ jobs:
                   "name": "Message",
                   "value": "$COMMIT_MSG",
                   "inline": false
+                },
+                {
+                  "name": "Frontend",
+                  "value": "$FRONTEND_VALUE",
+                  "inline": true
                 },
                 {
                   "name": "Workflow",
