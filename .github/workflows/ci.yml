@@ -12,6 +12,7 @@ jobs:
       SERVER_USER: ${{ secrets.SERVER_USER }}
       SERVER_PASSWORD: ${{ secrets.SERVER_PASSWORD }}
       SERVER_PATH: ${{ secrets.SERVER_PATH }}
+      DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
 
     steps:
       - name: Checkout code
@@ -22,10 +23,14 @@ jobs:
           echo "SERVER_IP:      ${SERVER_IP:-<empty>}"
           echo "SERVER_USER:    ${SERVER_USER:-<empty>}"
           echo "SERVER_PATH:    ${SERVER_PATH:-<empty>}"
+          echo "DISCORD_WEBHOOK: ${DISCORD_WEBHOOK_URL:+<set>}${DISCORD_WEBHOOK_URL:-<empty>}"
           # Don't print the password value for safety
           if [ -z "$SERVER_IP" ] || [ -z "$SERVER_USER" ] || [ -z "$SERVER_PASSWORD" ]; then
             echo "❌ One or more required secrets are missing (SERVER_IP / SERVER_USER / SERVER_PASSWORD)."
             exit 1
+          fi
+          if [ -z "$DISCORD_WEBHOOK_URL" ]; then
+            echo "⚠️  DISCORD_WEBHOOK_URL secret is not set. Discord notifications will be skipped."
           fi
 
       # ---------- Backend (.NET) ----------
@@ -74,3 +79,119 @@ jobs:
       - name: Show server path (debug)
         run: |
           echo "Will deploy to: $SERVER_PATH"
+
+      # ---------- Discord Notifications ----------
+      - name: Notify Discord on Success
+        if: success() && env.DISCORD_WEBHOOK_URL != ''
+        run: |
+          COMMIT_MSG=$(git log -1 --pretty=format:"%s" | sed 's/"/\\"/g' | sed ':a;N;$!ba;s/\n/\\n/g' || echo "N/A")
+          COMMIT_AUTHOR=$(git log -1 --pretty=format:"%an" | sed 's/"/\\"/g' || echo "N/A")
+          COMMIT_SHA=$(git rev-parse --short HEAD || echo "N/A")
+          BRANCH=$(git rev-parse --abbrev-ref HEAD || echo "N/A")
+          
+          JSON_PAYLOAD=$(cat <<EOF
+          {
+            "embeds": [{
+              "title": "✅ Deployment Successful",
+              "description": "Build and deployment completed successfully!",
+              "color": 3066993,
+              "fields": [
+                {
+                  "name": "Branch",
+                  "value": "$BRANCH",
+                  "inline": true
+                },
+                {
+                  "name": "Commit",
+                  "value": "\`$COMMIT_SHA\`",
+                  "inline": true
+                },
+                {
+                  "name": "Author",
+                  "value": "$COMMIT_AUTHOR",
+                  "inline": true
+                },
+                {
+                  "name": "Message",
+                  "value": "$COMMIT_MSG",
+                  "inline": false
+                },
+                {
+                  "name": "Server",
+                  "value": "$SERVER_IP",
+                  "inline": true
+                },
+                {
+                  "name": "Workflow",
+                  "value": "[View Run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})",
+                  "inline": true
+                }
+              ],
+              "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+              "footer": {
+                "text": "GitHub Actions"
+              }
+            }]
+          }
+          EOF
+          )
+          
+          curl -H "Content-Type: application/json" \
+            -X POST \
+            -d "$JSON_PAYLOAD" \
+            "$DISCORD_WEBHOOK_URL"
+
+      - name: Notify Discord on Failure
+        if: failure() && env.DISCORD_WEBHOOK_URL != ''
+        run: |
+          COMMIT_MSG=$(git log -1 --pretty=format:"%s" | sed 's/"/\\"/g' | sed ':a;N;$!ba;s/\n/\\n/g' || echo "N/A")
+          COMMIT_AUTHOR=$(git log -1 --pretty=format:"%an" | sed 's/"/\\"/g' || echo "N/A")
+          COMMIT_SHA=$(git rev-parse --short HEAD || echo "N/A")
+          BRANCH=$(git rev-parse --abbrev-ref HEAD || echo "N/A")
+          
+          JSON_PAYLOAD=$(cat <<EOF
+          {
+            "embeds": [{
+              "title": "❌ Deployment Failed",
+              "description": "Build or deployment encountered an error!",
+              "color": 15158332,
+              "fields": [
+                {
+                  "name": "Branch",
+                  "value": "$BRANCH",
+                  "inline": true
+                },
+                {
+                  "name": "Commit",
+                  "value": "\`$COMMIT_SHA\`",
+                  "inline": true
+                },
+                {
+                  "name": "Author",
+                  "value": "$COMMIT_AUTHOR",
+                  "inline": true
+                },
+                {
+                  "name": "Message",
+                  "value": "$COMMIT_MSG",
+                  "inline": false
+                },
+                {
+                  "name": "Workflow",
+                  "value": "[View Run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})",
+                  "inline": false
+                }
+              ],
+              "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+              "footer": {
+                "text": "GitHub Actions"
+              }
+            }]
+          }
+          EOF
+          )
+          
+          curl -H "Content-Type: application/json" \
+            -X POST \
+            -d "$JSON_PAYLOAD" \
+            "$DISCORD_WEBHOOK_URL"
