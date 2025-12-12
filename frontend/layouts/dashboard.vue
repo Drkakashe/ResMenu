@@ -1,18 +1,25 @@
 <template>
-  <div class="min-h-screen bg-neutral-50 text-neutral-800">
+  <div class="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-white">
+    <!-- Animated background elements -->
+    <div class="fixed inset-0 overflow-hidden pointer-events-none">
+      <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-10 animate-blob" />
+      <div class="absolute top-1/3 right-1/4 w-96 h-96 bg-pink-500 rounded-full mix-blend-multiply filter blur-3xl opacity-10 animate-blob animation-delay-2000" />
+      <div class="absolute bottom-1/4 left-1/2 w-96 h-96 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl opacity-10 animate-blob animation-delay-4000" />
+    </div>
+
     <!-- Sidebar -->
     <aside
-      class="fixed inset-y-0 z-40 w-72 bg-white border-r border-neutral-200 shadow-soft transition-transform duration-300 ease-in-out md:translate-x-0"
+      class="fixed inset-y-0 z-40 w-72 bg-slate-900/80 backdrop-blur-xl border-r border-white/10 shadow-2xl transition-transform duration-300 ease-in-out md:translate-x-0"
       :class="sidebarClasses"
     >
-      <div class="flex items-center justify-between px-6 py-6 border-b border-neutral-200">
+      <div class="flex items-center justify-between px-6 py-6 border-b border-white/10">
         <div>
-          <p class="text-xs uppercase tracking-widest text-primary-600 font-semibold">{{ $t('common.appName') }}</p>
-          <h1 class="text-xl font-bold text-neutral-900 mt-1">{{ restaurantName }}</h1>
+          <p class="text-xs uppercase tracking-widest text-purple-400 font-semibold">{{ $t('common.appName') }}</p>
+          <h1 class="text-xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent mt-1">{{ restaurantName }}</h1>
         </div>
         <button
           @click="toggleSidebar"
-          class="rounded-lg p-2 text-neutral-400 hover:bg-neutral-100 hover:text-neutral-600 transition-colors md:hidden"
+          class="rounded-lg p-2 text-gray-400 hover:bg-white/10 hover:text-white transition-colors md:hidden"
         >
           <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -20,7 +27,7 @@
         </button>
       </div>
 
-      <nav class="mt-6 space-y-1 px-4">
+      <nav class="mt-6 space-y-2 px-4">
         <NuxtLink
           v-for="item in navigation"
           :key="item.name"
@@ -36,13 +43,13 @@
         </NuxtLink>
       </nav>
 
-      <div class="mt-auto px-4 pb-6 pt-8">
-        <div class="rounded-xl border border-neutral-200 bg-neutral-50 p-4 text-sm">
-          <p class="font-semibold text-neutral-900">{{ authStore.user?.name }}</p>
-          <p class="text-xs text-primary-600 uppercase tracking-wide mt-1">{{ authStore.user?.role }}</p>
+      <div class="absolute bottom-0 left-0 right-0 px-4 pb-6 pt-8">
+        <div class="rounded-xl bg-white/5 backdrop-blur-sm border border-white/10 p-4 text-sm hover:bg-white/10 transition-all duration-300">
+          <p class="font-semibold text-white">{{ authStore.user?.name }}</p>
+          <p class="text-xs text-purple-400 uppercase tracking-wide mt-1">{{ authStore.user?.role }}</p>
           <button
             @click="handleLogout"
-            class="mt-4 flex w-full items-center justify-center gap-2 rounded-lg bg-primary-600 px-4 py-2.5 text-sm font-medium text-white shadow-md hover:bg-primary-700 hover:shadow-lg transition-all duration-200 active:scale-[0.98]"
+            class="mt-4 flex w-full items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 px-4 py-2.5 text-sm font-medium text-white shadow-lg hover:shadow-purple-500/50 transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98]"
           >
             <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
@@ -54,11 +61,13 @@
     </aside>
 
     <!-- Mobile backdrop -->
-    <div
-      v-if="sidebarOpen"
-      class="fixed inset-0 z-30 bg-black/40 backdrop-blur-sm md:hidden"
-      @click="toggleSidebar"
-    ></div>
+    <Transition name="fade">
+      <div
+        v-if="sidebarOpen"
+        class="fixed inset-0 z-30 bg-black/60 backdrop-blur-sm md:hidden"
+        @click="toggleSidebar"
+      ></div>
+    </Transition>
 
     <!-- Main content -->
     <div :class="mainContainerClasses">
@@ -73,21 +82,21 @@
             </svg>
           </button>
           <div :class="headerTextClasses">
-            <p class="text-xs uppercase tracking-widest text-primary-600 font-semibold">{{ pageTitle }}</p>
-            <h2 class="text-lg font-semibold text-neutral-900">{{ pageSubtitle }}</h2>
+            <p class="text-xs uppercase tracking-widest text-purple-400 font-semibold">{{ pageTitle }}</p>
+            <h2 class="text-lg font-semibold text-white">{{ pageSubtitle }}</h2>
           </div>
         </div>
 
         <div class="flex items-center gap-4">
           <LanguageSwitcher />
-          <div class="hidden sm:flex items-center gap-2 rounded-lg border border-neutral-200 bg-white px-4 py-2 text-sm shadow-sm">
-            <span class="font-medium text-neutral-700">{{ $t('common.welcome') }}</span>
-            <span class="text-primary-600 font-semibold">{{ authStore.user?.name }}</span>
+          <div class="hidden sm:flex items-center gap-2 rounded-lg bg-white/10 backdrop-blur-sm border border-white/10 px-4 py-2 text-sm shadow-lg">
+            <span class="font-medium text-gray-300">{{ $t('common.welcome') }}</span>
+            <span class="text-transparent bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text font-semibold">{{ authStore.user?.name }}</span>
           </div>
         </div>
       </header>
 
-      <main class="px-4 py-8 sm:px-8">
+      <main class="px-4 py-8 sm:px-8 relative z-10">
         <slot />
       </main>
     </div>
@@ -143,23 +152,6 @@ const navigation = computed(() => [
       ])
   },
   {
-    name: t('navigation.templates'),
-    href: '/dashboard/templates',
-    icon: () =>
-      h('svg', { class: 'h-4 w-4', fill: 'none', stroke: 'currentColor', viewBox: '0 0 24 24' }, [
-        h('path', { 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'stroke-width': '2', d: 'M12 20h9' }),
-        h('path', { 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'stroke-width': '2', d: 'M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4 12.5-12.5z' })
-      ])
-  },
-  {
-    name: 'Menu Designer',
-    href: '/dashboard/designer',
-    icon: () =>
-      h('svg', { class: 'h-4 w-4', fill: 'none', stroke: 'currentColor', viewBox: '0 0 24 24' }, [
-        h('path', { 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'stroke-width': '2', d: 'M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01' })
-      ])
-  },
-  {
     name: 'Settings',
     href: '/dashboard/settings',
     icon: () =>
@@ -179,17 +171,17 @@ const navigation = computed(() => [
 ])
 
 const navClass = (href: string) => [
-  'group flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium transition-all duration-200',
+  'group flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-all duration-200',
   route.path === href
-    ? 'bg-primary-600 text-white shadow-md'
-    : 'text-neutral-700 hover:bg-neutral-100 hover:text-neutral-900'
+    ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg shadow-purple-500/30'
+    : 'text-gray-300 hover:bg-white/10 hover:text-white'
 ]
 
 const iconClass = (href: string) => [
   'flex h-10 w-10 items-center justify-center rounded-lg transition-all duration-200',
   route.path === href
-    ? 'bg-white text-primary-600'
-    : 'bg-neutral-100 text-neutral-600 group-hover:bg-neutral-200'
+    ? 'bg-white/20 text-white'
+    : 'bg-white/5 text-gray-400 group-hover:bg-white/10 group-hover:text-white'
 ]
 
 const pageTitle = computed(() => {
@@ -205,8 +197,8 @@ const pageSubtitle = computed(() => {
       return t('qr.title')
     case '/dashboard/templates':
       return t('navigation.templates')
-    case '/dashboard/designer':
-      return 'Create custom menu designs'
+    case '/dashboard/settings':
+      return t('navigation.settings')
     default:
       return t('dashboard.overview')
   }
@@ -230,7 +222,7 @@ const mainContainerClasses = computed(() => [
 ])
 
 const headerClasses = computed(() => [
-  'sticky top-0 z-20 flex h-20 items-center justify-between border-b border-neutral-200 bg-white/90 px-6 backdrop-blur-sm shadow-sm',
+  'sticky top-0 z-20 flex h-20 items-center justify-between border-b border-white/10 bg-slate-900/60 backdrop-blur-xl px-6 shadow-lg',
   isRtl.value ? 'flex-row-reverse' : 'flex-row'
 ])
 
@@ -245,7 +237,7 @@ const headerTextClasses = computed(() => [
 ])
 
 const menuButtonClasses = computed(() => [
-  'rounded-lg border border-neutral-300 bg-white p-2 text-neutral-600 shadow-sm hover:bg-neutral-50 transition-colors md:hidden',
+  'rounded-lg bg-white/10 backdrop-blur-sm border border-white/10 p-2 text-gray-300 shadow-lg hover:bg-white/20 hover:text-white transition-all duration-200 md:hidden',
   isRtl.value ? 'ml-3' : 'mr-3'
 ])
 
@@ -287,3 +279,34 @@ watch(
   }
 )
 </script>
+
+<style scoped>
+@keyframes blob {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(30px, -50px) scale(1.1); }
+  66% { transform: translate(-20px, 20px) scale(0.9); }
+}
+
+.animate-blob {
+  animation: blob 7s infinite;
+}
+
+.animation-delay-2000 {
+  animation-delay: 2s;
+}
+
+.animation-delay-4000 {
+  animation-delay: 4s;
+}
+
+/* Fade transition for mobile backdrop */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+</style>

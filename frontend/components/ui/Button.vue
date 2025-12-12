@@ -38,17 +38,17 @@ const emit = defineEmits<{
   (e: 'click', event: MouseEvent): void
 }>()
 
-const baseClasses = 'inline-flex items-center justify-center font-medium rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed'
+const baseClasses = 'inline-flex items-center justify-center font-medium rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-900 disabled:opacity-50 disabled:cursor-not-allowed'
 
 const variantClasses = computed(() => {
   const variants = {
-    primary: 'bg-primary-600 text-white hover:bg-primary-700 focus:ring-primary-500 shadow-md hover:shadow-lg active:scale-[0.98]',
-    secondary: 'bg-white text-neutral-700 border border-neutral-300 hover:bg-neutral-50 focus:ring-neutral-500 shadow-sm hover:shadow-md active:scale-[0.98]',
-    success: 'bg-green-600 text-white hover:bg-green-700 focus:ring-green-500 shadow-md hover:shadow-lg active:scale-[0.98]',
-    danger: 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500 shadow-md hover:shadow-lg active:scale-[0.98]',
-    warning: 'bg-accent-500 text-white hover:bg-accent-600 focus:ring-accent-500 shadow-md hover:shadow-lg active:scale-[0.98]',
-    accent: 'bg-accent-500 text-white hover:bg-accent-600 focus:ring-accent-500 shadow-md hover:shadow-lg active:scale-[0.98]',
-    ghost: 'bg-transparent text-neutral-700 hover:bg-neutral-100 focus:ring-neutral-500 active:scale-[0.98]'
+    primary: 'bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white focus:ring-purple-500 shadow-lg hover:shadow-purple-500/50 transform hover:scale-[1.02] active:scale-[0.98]',
+    secondary: 'bg-white/10 backdrop-blur-sm text-gray-300 border border-white/20 hover:bg-white/15 hover:border-white/30 focus:ring-purple-500 shadow-md active:scale-[0.98]',
+    success: 'bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white focus:ring-green-500 shadow-lg hover:shadow-green-500/50 transform hover:scale-[1.02] active:scale-[0.98]',
+    danger: 'bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white focus:ring-red-500 shadow-lg hover:shadow-red-500/50 transform hover:scale-[1.02] active:scale-[0.98]',
+    warning: 'bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white focus:ring-amber-500 shadow-lg hover:shadow-amber-500/50 transform hover:scale-[1.02] active:scale-[0.98]',
+    accent: 'bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white focus:ring-blue-500 shadow-lg hover:shadow-blue-500/50 transform hover:scale-[1.02] active:scale-[0.98]',
+    ghost: 'bg-transparent text-gray-300 hover:bg-white/10 focus:ring-purple-500 active:scale-[0.98]'
   }
   return variants[props.variant]
 })

@@ -1,12 +1,12 @@
 <template>
   <div class="w-full">
-    <label v-if="label" :for="id" class="block text-sm font-medium text-neutral-700 mb-2">
+    <label v-if="label" :for="id" class="block text-sm font-medium text-gray-200 mb-2">
       {{ label }}
-      <span v-if="required" class="text-primary-600">*</span>
+      <span v-if="required" class="text-pink-400">*</span>
     </label>
 
     <div class="relative">
-      <div v-if="$slots.prefix" class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-neutral-400">
+      <div v-if="$slots.prefix" class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
         <slot name="prefix"></slot>
       </div>
 
@@ -27,13 +27,13 @@
         @focus="handleFocus"
       />
 
-      <div v-if="$slots.suffix" class="absolute inset-y-0 right-0 pr-4 flex items-center text-neutral-400">
+      <div v-if="$slots.suffix" class="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400">
         <slot name="suffix"></slot>
       </div>
     </div>
 
-    <p v-if="error" class="mt-2 text-sm text-primary-600">{{ error }}</p>
-    <p v-else-if="hint" class="mt-2 text-sm text-neutral-500">{{ hint }}</p>
+    <p v-if="error" class="mt-2 text-sm text-red-400">{{ error }}</p>
+    <p v-else-if="hint" class="mt-2 text-sm text-gray-400">{{ hint }}</p>
   </div>
 </template>
 
@@ -67,7 +67,7 @@ const emit = defineEmits<{
   (e: 'focus'): void
 }>()
 
-const baseClasses = 'block w-full px-4 py-2.5 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-0 transition-all duration-200 sm:text-sm bg-white'
+const baseClasses = 'block w-full px-4 py-2.5 border rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-0 transition-all duration-200 sm:text-sm bg-white/10 backdrop-blur-sm text-white placeholder-gray-400'
 
 const slots = useSlots()
 
@@ -75,13 +75,13 @@ const inputClasses = computed(() => {
   const classes = [baseClasses]
 
   if (props.error) {
-    classes.push('border-primary-300 text-primary-900 placeholder-primary-300 focus:ring-primary-500 focus:border-primary-500')
+    classes.push('border-red-500/30 focus:ring-red-500 focus:border-transparent')
   } else {
-    classes.push('border-neutral-300 focus:ring-primary-500 focus:border-primary-500 hover:border-neutral-400')
+    classes.push('border-white/20 focus:ring-purple-500 focus:border-transparent hover:bg-white/15 hover:border-white/30')
   }
 
   if (props.disabled) {
-    classes.push('bg-neutral-50 text-neutral-500 cursor-not-allowed')
+    classes.push('bg-white/5 text-gray-500 cursor-not-allowed opacity-50')
   }
 
   if (slots.prefix) {

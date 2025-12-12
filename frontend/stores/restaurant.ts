@@ -194,21 +194,33 @@ export const useRestaurantStore = defineStore('restaurant', {
       });
 
       if (response.data.success) {
+        const data = response.data.data || {}
         const normalizedMenu = {
-          ...response.data.data,
-          restaurantLocalizedName:
-            response.data.data?.restaurantLocalizedName ?? response.data.data?.restaurantName,
-          language: response.data.data?.language ?? language ?? 'en',
-          theme: response.data.data?.theme ?? null,
-          displaySettings: response.data.data?.displaySettings ?? null,
-          currency: response.data.data?.currency ?? 'USD',
-          categories: normalizeCategoryTree(response.data.data?.categories ?? []),
-        } as PublicMenu;
-        this.publicMenu = normalizedMenu;
-        console.log('=== STORE: Normalized Public Menu ===');
-        console.log('Theme:', normalizedMenu.theme);
-        console.log('Display Settings:', normalizedMenu.displaySettings);
-        return normalizedMenu;
+          restaurantId: data.restaurantId || data.RestaurantId || '',
+          restaurantName: data.restaurantName || data.RestaurantName || '',
+          restaurantLocalizedName: data.restaurantLocalizedName || data.RestaurantLocalizedName || data.restaurantName || data.RestaurantName || '',
+          logoUrl: data.logoUrl || data.LogoUrl || null,
+          contactPhone: data.contactPhone || data.ContactPhone || null,
+          contactEmail: data.contactEmail || data.ContactEmail || null,
+          address: data.address || data.Address || null,
+          language: data.language || language || 'en',
+          theme: data.theme || null,
+          displaySettings: data.displaySettings || null,
+          currency: data.currency || 'USD',
+          layoutConfiguration: data.layoutConfiguration || null,
+          headerColor: data.headerColor || null,
+          headerImageUrl: data.headerImageUrl || null,
+          headerDisplayMode: data.headerDisplayMode || null,
+          categories: normalizeCategoryTree(data.categories || []),
+        } as PublicMenu
+        this.publicMenu = normalizedMenu
+        console.log('=== STORE: Normalized Public Menu ===')
+        console.log('Restaurant Name:', normalizedMenu.restaurantName)
+        console.log('Restaurant Localized Name:', normalizedMenu.restaurantLocalizedName)
+        console.log('LogoUrl:', normalizedMenu.logoUrl)
+        console.log('Theme:', normalizedMenu.theme)
+        console.log('Display Settings:', normalizedMenu.displaySettings)
+        return normalizedMenu
       }
 
       throw new Error(response.data.message || 'Failed to fetch menu');

@@ -1,9 +1,9 @@
 <template>
   <div :class="cardClasses">
-    <div v-if="$slots.header || title" class="px-6 py-5 border-b border-neutral-200">
+    <div v-if="$slots.header || title" class="px-6 py-5 border-b border-white/10">
       <slot name="header">
-        <h3 class="text-lg leading-6 font-semibold text-neutral-900">{{ title }}</h3>
-        <p v-if="subtitle" class="mt-1 text-sm text-neutral-600">{{ subtitle }}</p>
+        <h3 class="text-lg leading-6 font-semibold text-white">{{ title }}</h3>
+        <p v-if="subtitle" class="mt-1 text-sm text-gray-300">{{ subtitle }}</p>
       </slot>
     </div>
 
@@ -11,7 +11,7 @@
       <slot></slot>
     </div>
 
-    <div v-if="$slots.footer" class="px-6 py-4 border-t border-neutral-200 bg-neutral-50 rounded-b-xl">
+    <div v-if="$slots.footer" class="px-6 py-4 border-t border-white/10 bg-white/5 rounded-b-xl">
       <slot name="footer"></slot>
     </div>
   </div>
@@ -32,15 +32,15 @@ const props = withDefaults(defineProps<Props>(), {
   clickable: false
 })
 
-const baseClasses = 'bg-white overflow-hidden rounded-xl'
+const baseClasses = 'bg-white/10 backdrop-blur-xl overflow-hidden rounded-2xl border border-white/20'
 
 const cardClasses = computed(() => {
   const classes = [baseClasses]
 
   if (props.hover) {
-    classes.push('shadow-soft hover:shadow-medium transition-shadow duration-200')
+    classes.push('shadow-lg hover:shadow-2xl hover:border-white/30 transition-all duration-200')
   } else {
-    classes.push('shadow-soft')
+    classes.push('shadow-lg')
   }
 
   if (props.clickable) {

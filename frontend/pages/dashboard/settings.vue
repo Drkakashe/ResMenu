@@ -3,19 +3,19 @@
     <div class="space-y-6">
       <!-- Header -->
       <div>
-        <h1 class="text-2xl font-bold text-neutral-900">Restaurant Settings</h1>
-        <p class="mt-1 text-neutral-600">Manage your restaurant's basic information and preferences</p>
+        <h1 class="text-2xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">Restaurant Settings</h1>
+        <p class="mt-1 text-gray-300">Manage your restaurant's basic information and preferences</p>
       </div>
 
       <!-- Error State -->
-      <div v-if="!authStore.restaurantId" class="p-6 text-center bg-red-50 rounded-xl border border-red-200">
-        <p class="font-semibold text-red-700">No restaurant found</p>
-        <p class="mt-2 text-sm text-red-600">Please make sure you're logged in as a restaurant owner</p>
+      <div v-if="!authStore.restaurantId" class="p-6 text-center bg-red-500/20 backdrop-blur-sm rounded-xl border border-red-500/30">
+        <p class="font-semibold text-red-300">No restaurant found</p>
+        <p class="mt-2 text-sm text-red-400">Please make sure you're logged in as a restaurant owner</p>
       </div>
 
       <!-- Loading State -->
       <div v-else-if="loading" class="flex justify-center py-12">
-        <div class="inline-flex h-12 w-12 items-center justify-center rounded-full border-4 border-primary-200 border-t-primary-600 animate-spin"></div>
+        <div class="inline-flex h-12 w-12 items-center justify-center rounded-full border-4 border-purple-500/30 border-t-purple-500 animate-spin"></div>
       </div>
 
       <!-- Settings Content -->
@@ -43,27 +43,18 @@
 
             <!-- Logo Upload -->
             <div>
-              <label class="block text-sm font-medium text-neutral-700 mb-2">
+              <label class="block text-sm font-medium text-gray-200 mb-2">
                 Logo
               </label>
-              <div class="flex items-center gap-4">
-                <div v-if="form.logoUrl" class="w-20 h-20 rounded-lg overflow-hidden border-2 border-neutral-200">
-                  <img :src="form.logoUrl" alt="Restaurant logo" class="w-full h-full object-cover" />
-                </div>
-                <div v-else class="w-20 h-20 rounded-lg bg-neutral-100 flex items-center justify-center border-2 border-dashed border-neutral-300">
-                  <svg class="w-8 h-8 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                  </svg>
-                </div>
-                <div class="flex-1">
-                  <Input
-                    v-model="form.logoUrl"
-                    placeholder="https://example.com/logo.png"
-                    label="Logo URL"
-                  />
-                  <p class="mt-1 text-xs text-neutral-500">Enter a URL to your logo image</p>
-                </div>
-              </div>
+              <FileUpload
+                v-model="form.logoUrl"
+                label="Restaurant Logo"
+                accept="image/*"
+                :max-size="5"
+                :disabled="uploadingLogo"
+                :uploading="uploadingLogo"
+                @upload="handleLogoUpload"
+              />
             </div>
 
             <!-- Contact Information -->
@@ -85,24 +76,24 @@
             <!-- Address -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label class="block text-sm font-medium text-neutral-700 mb-1">
+                <label class="block text-sm font-medium text-gray-200 mb-1">
                   Address
                 </label>
                 <textarea
                   v-model="form.address"
                   rows="3"
-                  class="block w-full rounded-lg border-neutral-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm px-4 py-2"
+                  class="block w-full rounded-xl border shadow-sm transition-all duration-200 bg-white/10 backdrop-blur-sm border-white/20 text-white placeholder-gray-400 focus:border-transparent focus:ring-2 focus:ring-purple-500 hover:bg-white/15 hover:border-white/30 sm:text-sm px-4 py-2"
                   placeholder="123 Main St, City, Country"
                 ></textarea>
               </div>
               <div>
-                <label class="block text-sm font-medium text-neutral-700 mb-1">
+                <label class="block text-sm font-medium text-gray-200 mb-1">
                   Address (Arabic)
                 </label>
                 <textarea
                   v-model="form.addressAr"
                   rows="3"
-                  class="block w-full rounded-lg border-neutral-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm px-4 py-2"
+                  class="block w-full rounded-xl border shadow-sm transition-all duration-200 bg-white/10 backdrop-blur-sm border-white/20 text-white placeholder-gray-400 focus:border-transparent focus:ring-2 focus:ring-purple-500 hover:bg-white/15 hover:border-white/30 sm:text-sm px-4 py-2"
                   placeholder="١٢٣ شارع الرئيسي، المدينة، الدولة"
                   dir="rtl"
                 ></textarea>
@@ -111,134 +102,45 @@
           </div>
         </Card>
 
-        <!-- Display Settings -->
-        <Card>
-          <template #header>
-            <h2 class="text-lg font-semibold text-neutral-900">Menu Display Preferences</h2>
-          </template>
-          <div class="space-y-4">
-            <p class="text-sm text-neutral-600">
-              Control what information is shown on your public menu
-            </p>
-
-            <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <label class="flex gap-3 items-center p-3 rounded-lg border cursor-pointer border-neutral-200 hover:bg-neutral-50">
-                <input
-                  type="checkbox"
-                  v-model="form.displaySettings.showPrices"
-                  class="w-4 h-4 rounded text-primary-600 border-neutral-300 focus:ring-primary-500"
-                />
-                <div>
-                  <div class="font-medium text-neutral-900">Show Prices</div>
-                  <div class="text-xs text-neutral-600">Display item prices on the menu</div>
-                </div>
-              </label>
-
-              <label class="flex gap-3 items-center p-3 rounded-lg border cursor-pointer border-neutral-200 hover:bg-neutral-50">
-                <input
-                  type="checkbox"
-                  v-model="form.displaySettings.showImages"
-                  class="w-4 h-4 rounded text-primary-600 border-neutral-300 focus:ring-primary-500"
-                />
-                <div>
-                  <div class="font-medium text-neutral-900">Show Images</div>
-                  <div class="text-xs text-neutral-600">Display item images</div>
-                </div>
-              </label>
-
-              <label class="flex gap-3 items-center p-3 rounded-lg border cursor-pointer border-neutral-200 hover:bg-neutral-50">
-                <input
-                  type="checkbox"
-                  v-model="form.displaySettings.showDescriptions"
-                  class="w-4 h-4 rounded text-primary-600 border-neutral-300 focus:ring-primary-500"
-                />
-                <div>
-                  <div class="font-medium text-neutral-900">Show Descriptions</div>
-                  <div class="text-xs text-neutral-600">Display item descriptions</div>
-                </div>
-              </label>
-
-              <label class="flex gap-3 items-center p-3 rounded-lg border cursor-pointer border-neutral-200 hover:bg-neutral-50">
-                <input
-                  type="checkbox"
-                  v-model="form.displaySettings.showCategories"
-                  class="w-4 h-4 rounded text-primary-600 border-neutral-300 focus:ring-primary-500"
-                />
-                <div>
-                  <div class="font-medium text-neutral-900">Show Categories</div>
-                  <div class="text-xs text-neutral-600">Display category sections</div>
-                </div>
-              </label>
-
-              <label class="flex gap-3 items-center p-3 rounded-lg border cursor-pointer border-neutral-200 hover:bg-neutral-50">
-                <input
-                  type="checkbox"
-                  v-model="form.displaySettings.enableSearch"
-                  class="w-4 h-4 rounded text-primary-600 border-neutral-300 focus:ring-primary-500"
-                />
-                <div>
-                  <div class="font-medium text-neutral-900">Enable Search</div>
-                  <div class="text-xs text-neutral-600">Allow customers to search items</div>
-                </div>
-              </label>
-
-              <label class="flex gap-3 items-center p-3 rounded-lg border cursor-pointer border-neutral-200 hover:bg-neutral-50">
-                <input
-                  type="checkbox"
-                  v-model="form.displaySettings.enableFilters"
-                  class="w-4 h-4 rounded text-primary-600 border-neutral-300 focus:ring-primary-500"
-                />
-                <div>
-                  <div class="font-medium text-neutral-900">Enable Filters</div>
-                  <div class="text-xs text-neutral-600">Allow filtering by tags</div>
-                </div>
-              </label>
-            </div>
-          </div>
-        </Card>
-
         <!-- Localization -->
         <Card>
           <template #header>
-            <h2 class="text-lg font-semibold text-neutral-900">Localization</h2>
+            <h2 class="text-lg font-semibold text-white">Localization</h2>
           </template>
           <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
             <div>
-              <label class="block mb-2 text-sm font-medium text-neutral-700">
+              <label class="block mb-2 text-sm font-medium text-gray-200">
                 Currency
               </label>
               <select
                 v-model="form.currency"
-                class="block px-4 py-2.5 w-full rounded-lg border shadow-sm transition-all border-neutral-300 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                class="block px-4 py-2.5 w-full rounded-xl border shadow-sm transition-all duration-200 bg-white/10 backdrop-blur-sm border-white/20 text-white focus:border-transparent focus:ring-2 focus:ring-purple-500 hover:bg-white/15 hover:border-white/30"
               >
-                <option value="USD">USD ($)</option>
-                <option value="EUR">EUR (€)</option>
-                <option value="GBP">GBP (£)</option>
-                <option value="SAR">SAR (﷼)</option>
-                <option value="AED">AED (د.إ)</option>
-                <option value="EGP">EGP (E£)</option>
+                <option value="USD" class="bg-slate-800">USD</option>
+                <option value="IQD" class="bg-slate-800">IQD</option>
+              
               </select>
             </div>
 
             <div>
-              <label class="block mb-2 text-sm font-medium text-neutral-700">
+              <label class="block mb-2 text-sm font-medium text-gray-200">
                 Default Language
               </label>
               <select
                 v-model="form.defaultLanguage"
-                class="block px-4 py-2.5 w-full rounded-lg border shadow-sm transition-all border-neutral-300 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                class="block px-4 py-2.5 w-full rounded-xl border shadow-sm transition-all duration-200 bg-white/10 backdrop-blur-sm border-white/20 text-white focus:border-transparent focus:ring-2 focus:ring-purple-500 hover:bg-white/15 hover:border-white/30"
               >
-                <option value="en">English</option>
-                <option value="ar">Arabic</option>
-                <option value="fr">French</option>
-                <option value="es">Spanish</option>
+                <option value="en" class="bg-slate-800">English</option>
+                <option value="ar" class="bg-slate-800">Arabic</option>
+                <option value="fr" class="bg-slate-800">French</option>
+                <option value="es" class="bg-slate-800">Spanish</option>
               </select>
             </div>
           </div>
         </Card>
 
         <!-- Save Button -->
-        <div class="flex gap-3 justify-end pt-4 border-t">
+        <div class="flex gap-3 justify-end pt-4 border-t border-white/10">
           <UiButton @click="loadSettings" variant="secondary">
             Cancel
           </UiButton>
@@ -257,6 +159,7 @@ import { useAuthStore } from '~/stores/auth'
 import Card from '~/components/ui/Card.vue'
 import Input from '~/components/ui/Input.vue'
 import UiButton from '~/components/ui/Button.vue'
+import FileUpload from '~/components/ui/FileUpload.vue'
 
 definePageMeta({
   layout: false,
@@ -269,6 +172,7 @@ const api = useApi()
 
 const loading = ref(false)
 const saving = ref(false)
+const uploadingLogo = ref(false)
 
 interface RestaurantForm {
   name: string
@@ -278,14 +182,6 @@ interface RestaurantForm {
   contactEmail: string
   address: string
   addressAr: string
-  displaySettings: {
-    showPrices: boolean
-    showImages: boolean
-    showDescriptions: boolean
-    showCategories: boolean
-    enableSearch: boolean
-    enableFilters: boolean
-  }
   currency: string
   defaultLanguage: string
 }
@@ -298,14 +194,6 @@ const form = ref<RestaurantForm>({
   contactEmail: '',
   address: '',
   addressAr: '',
-  displaySettings: {
-    showPrices: true,
-    showImages: true,
-    showDescriptions: true,
-    showCategories: true,
-    enableSearch: true,
-    enableFilters: true
-  },
   currency: 'USD',
   defaultLanguage: 'en'
 })
@@ -323,7 +211,7 @@ const loadSettings = async () => {
     const restaurant = response.data
 
     // Parse translations
-    let translations = {}
+    let translations: any = {}
     if (restaurant.translations) {
       try {
         translations = typeof restaurant.translations === 'string' 
@@ -331,19 +219,6 @@ const loadSettings = async () => {
           : restaurant.translations
       } catch (e) {
         console.error('Failed to parse translations:', e)
-      }
-    }
-
-    // Parse display settings
-    let displaySettings = form.value.displaySettings
-    if (restaurant.menuDisplaySettings) {
-      try {
-        const parsed = typeof restaurant.menuDisplaySettings === 'string'
-          ? JSON.parse(restaurant.menuDisplaySettings)
-          : restaurant.menuDisplaySettings
-        displaySettings = { ...displaySettings, ...parsed }
-      } catch (e) {
-        console.error('Failed to parse display settings:', e)
       }
     }
 
@@ -355,7 +230,6 @@ const loadSettings = async () => {
       contactEmail: restaurant.contactEmail || '',
       address: restaurant.address || '',
       addressAr: translations.ar?.address || '',
-      displaySettings,
       currency: restaurant.currency || 'USD',
       defaultLanguage: restaurant.defaultLanguage || 'en'
     }
@@ -364,6 +238,35 @@ const loadSettings = async () => {
     toast.error('Failed to load settings')
   } finally {
     loading.value = false
+  }
+}
+
+const handleLogoUpload = async (file: File) => {
+  uploadingLogo.value = true
+  const formData = new FormData()
+  formData.append('file', file)
+
+  try {
+    const response = await api.post('/Files/upload', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    })
+
+    // The API returns Result<string> with success and data properties
+    if (response.data.success) {
+      form.value.logoUrl = response.data.data
+      toast.success('Logo uploaded successfully!')
+    } else {
+      throw new Error(response.data.message || 'Upload failed')
+    }
+  } catch (error: any) {
+    toast.error('Failed to upload logo')
+    const errorMessage = error?.response?.data?.message || error?.response?.data?.error || error?.message || 'Failed to upload logo'
+    toast.error(errorMessage)
+    form.value.logoUrl = ''
+  } finally {
+    uploadingLogo.value = false
   }
 }
 
@@ -392,7 +295,6 @@ const saveSettings = async () => {
       contactEmail: form.value.contactEmail || null,
       address: form.value.address || null,
       translations: JSON.stringify(translations),
-      menuDisplaySettings: JSON.stringify(form.value.displaySettings),
       currency: form.value.currency,
       defaultLanguage: form.value.defaultLanguage
     }

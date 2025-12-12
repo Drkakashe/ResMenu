@@ -24,12 +24,12 @@
       <div class="flex-1 min-w-0">
         <div class="flex items-center justify-between mb-3">
           <div class="flex items-center gap-3">
-            <input
-              v-model="localCategory.name"
-              @blur="updateCategory"
-              class="text-xl font-bold text-neutral-900 bg-transparent border-none focus:outline-none focus:ring-2 focus:ring-primary-500 rounded px-2 -ml-2"
-              placeholder="Category Name"
-            />
+            <h3 class="text-xl font-bold text-neutral-900">
+              {{ category.name }}
+              <span v-if="category.translations?.ar?.name" class="text-sm font-normal text-neutral-500 ml-2">
+                ({{ category.translations.ar.name }})
+              </span>
+            </h3>
             <span class="px-2 py-1 text-xs font-medium text-neutral-600 bg-neutral-100 rounded">
               {{ category.items.length }} items
             </span>
@@ -37,6 +37,16 @@
 
           <!-- Actions -->
           <div class="flex items-center gap-2">
+            <button
+              @click="$emit('edit-translations', category)"
+              class="p-2 text-neutral-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
+              title="Edit Translations"
+            >
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
+              </svg>
+            </button>
+
             <button
               @click="$emit('customize')"
               class="p-2 text-neutral-600 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-all"
@@ -73,6 +83,7 @@
             @drop="handleItemDrop(index)"
             @drag-end="draggedOverItemIndex = null"
             @update="updateItem"
+            @edit="$emit('edit-item', item, category)"
             @delete="deleteItem(item.id)"
           />
 
@@ -109,11 +120,12 @@ const emit = defineEmits<{
   (e: 'update', category: MenuCategory): void
   (e: 'delete'): void
   (e: 'customize'): void
+  (e: 'edit-translations', category: MenuCategory): void
   (e: 'add-item'): void
+  (e: 'edit-item', item: MenuItem, category: MenuCategory): void
   (e: 'reorder-items', items: MenuItem[]): void
 }>()
 
-const localCategory = reactive({ ...props.category })
 const draggedOverItemIndex = ref<number | null>(null)
 
 const {
@@ -127,10 +139,6 @@ const {
 const handleDragOver = (event: DragEvent) => {
   event.preventDefault()
   emit('drag-over', event)
-}
-
-const updateCategory = () => {
-  emit('update', { ...props.category, name: localCategory.name })
 }
 
 const updateItem = (item: MenuItem) => {

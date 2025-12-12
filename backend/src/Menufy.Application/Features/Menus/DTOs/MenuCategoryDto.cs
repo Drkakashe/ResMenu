@@ -17,10 +17,13 @@ public class MenuCategoryDto
 
 public class CreateCategoryDto
 {
+  
+
     public string Name { get; set; } = string.Empty;
+    public string? ArabicName { get; set; }
     public int DisplayOrder { get; set; }
     public Guid? ParentCategoryId { get; set; }
-    public Dictionary<string, string>? Translations { get; set; }
+    public Dictionary<string, string>? Translations { get; set; } 
 }
 
 public class UpdateCategoryDto

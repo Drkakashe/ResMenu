@@ -70,10 +70,10 @@ public class GetPublicMenuQueryHandler : IRequestHandler<GetPublicMenuQuery, Res
         var categoriesQuery = _context.MenuCategories
             .Where(c => c.RestaurantId == restaurant.Id);
         
-        if (configuredCategoryIds != null && configuredCategoryIds.Count > 0)
-        {
-            categoriesQuery = categoriesQuery.Where(c => configuredCategoryIds.Contains(c.Id));
-        }
+        // if (configuredCategoryIds != null && configuredCategoryIds.Count > 0)
+        // {
+        //     categoriesQuery = categoriesQuery.Where(c => configuredCategoryIds.Contains(c.Id));
+        // }
         
         var categories = await categoriesQuery
             .OrderBy(c => c.DisplayOrder)

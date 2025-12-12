@@ -29,6 +29,10 @@ public class UpdateRestaurantCommandHandler : IRequestHandler<UpdateRestaurantCo
         restaurant.Address = request.Address;
         restaurant.Translations = request.Translations;
         restaurant.IsActive = request.IsActive;
+        if (!string.IsNullOrEmpty(request.Currency))
+        {
+            restaurant.Currency = request.Currency;
+        }
 
         await _context.SaveChangesAsync(cancellationToken);
 
